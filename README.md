@@ -15,7 +15,7 @@ An AI Agent Trajectory Explorer built with Hugo and JavaScript for viewing AI ag
 ## Project Structure
 
 ```
-traj-viewer-mini/
+mini-traj-web-browser/
 ├── data/                           # Trajectory data directory
 │   └── [experiment-name]/          # Experiment folders
 │       └── [instance-name]/        # Instance folders
