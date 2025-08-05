@@ -9,6 +9,7 @@ class TrajectoryViewer {
     }
 
     async init() {
+        this.initTheme();
         await this.loadExperiments();
         this.setupEventListeners();
         this.updateUI();
@@ -120,6 +121,70 @@ class TrajectoryViewer {
         document.getElementById('instance-select').addEventListener('change', (e) => {
             this.selectInstance(e.target.value);
         });
+
+        // Theme toggle
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            this.toggleTheme();
+        });
+    }
+
+    initTheme() {
+        // Initialize theme from localStorage with thread-safe access
+        const savedTheme = this.getStoredTheme();
+        this.setTheme(savedTheme);
+    }
+
+    getStoredTheme() {
+        try {
+            return localStorage.getItem('trajectory-viewer-theme') || 'light';
+        } catch (error) {
+            console.warn('Failed to access localStorage for theme:', error);
+            return 'light';
+        }
+    }
+
+    setStoredTheme(theme) {
+        try {
+            localStorage.setItem('trajectory-viewer-theme', theme);
+        } catch (error) {
+            console.warn('Failed to save theme to localStorage:', error);
+        }
+    }
+
+    setTheme(theme) {
+        const validThemes = ['light', 'dark'];
+        const currentTheme = validThemes.includes(theme) ? theme : 'light';
+        
+        // Apply theme to document
+        if (currentTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+        }
+        
+        // Update theme toggle icon
+        this.updateThemeIcon(currentTheme);
+        
+        // Store theme preference
+        this.setStoredTheme(currentTheme);
+    }
+
+    toggleTheme() {
+        const currentTheme = this.getCurrentTheme();
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        this.setTheme(newTheme);
+    }
+
+    getCurrentTheme() {
+        return document.documentElement.hasAttribute('data-theme') ? 'dark' : 'light';
+    }
+
+    updateThemeIcon(theme) {
+        const themeIcon = document.querySelector('.theme-icon');
+        if (themeIcon) {
+            // Use moon icon for light mode (to switch to dark), sun icon for dark mode (to switch to light)
+            themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
     }
 
     populateExperimentDropdown() {
