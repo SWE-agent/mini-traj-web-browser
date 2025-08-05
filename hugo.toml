@@ -1,4 +1,4 @@
-baseURL = 'http://localhost:1313'
+baseURL = 'https://swe-agent.github.io/traj-viewer-mini'
 languageCode = 'en-us'
 title = 'Trajectory Viewer'
 
