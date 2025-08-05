@@ -1,0 +1,8 @@
+{
+  "experiments": [
+    {
+      "name": "example-experiemnt",
+      "instances": ["example_instance"]
+    }
+  ]
+}

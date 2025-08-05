@@ -1,0 +1,113 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+
+We're building a trajectory viewer in HTML, an explorer for AI agent runs.
+The viewer should be implemented with hugo as a static page generator + js/ts.
+
+## Data source
+
+* We need a data directory.
+* It has subdirectories called "experiments".
+* Every experiment folder has subfolders for different "instances"
+* Every instance directory contains a single file with ".traj.json" extension
+* The .traj.json file contains the data we want to show.
+
+Here's an example of the data source
+
+```
+{
+  "info": {
+    "exit_status": null,
+    "submission": null,
+    "model_stats": {
+      "instance_cost": 0.0661002,
+      "api_calls": 11
+    }
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant that can interact with a computer.\n\nYour response must contain exactly ONE bash code block with ONE command (or commands connected with && or ||).\nInclude a THOUGHT section before your command where you explain your reasoning process.\nFormat your response as shown in <format_example>.\n\n<format_example>\nYour reasoning and analysis here. Explain why you want to perform the action.\n\n```bash\nyour_command_here\n```\n</format_example>\n\nFailure to follow these rules will cause your response to be rejected.\nTo finish, issue the following command: `echo MINI_SWE_AGENT_FINAL_OUTPUT`\nwithout any other command."
+    },
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "Please solve this issue: in gitconfig, add a new alias ldc which copies the last diff ..."
+        }
+      ]
+    },
+    {
+      "role": "assistant",
+      "content": "THOUGHT: I need to first look at the current directory to see the gitconfig file and understand its structure. Then I'll examine the existing aliases to understand the pattern and add the new 'ldc' alias that combines 'ld' (last diff) with clipboard functionality.\n\n```bash\nls -la\n```"
+    },
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "<returncode>0</returncode>\n<output>\ntotal 1232\ndrwxr-xr-x  ..."
+        }
+      ]
+    },
+    {
+      "role": "assistant",
+      "content": "THOUGHT: I can see there's a `gitconfig.sh` file in the current directory. Let me examine its contents to understand the current structure and find the existing aliases, particularly looking for the 'ld' alias and any clipboard-related aliases that I need to combine.\n\n```bash\ncat gitconfig.sh\n```"
+    },
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "...."
+        }
+      ]
+    },
+    {
+      "role": "assistant",
+      "content": "THOUGHT: Now I can see the gitconfig structure. I found the `ld` alias which does `diff HEAD~1` and I can see there are clipboard-related aliases like `clc` and `urlclip` that use a clip function. The `clc` alias copies the latest commit hash and uses `pbcopy` on macOS. I need to create an `ldc` alias that combines the `ld` functionality with clipboard copying. I'll add it in the \"Diffing\" section where the other diff-related aliases are located.\n\n```bash\nsed -i '' '/# Diff from before last commit/a\\\n    ldc = \"!clip() { if [[ $(uname) == Darwin ]]; then pbcopy; else xclip -selection clipboard; fi; }; git diff HEAD~1 | clip\"' gitconfig.sh\n```"
+    },
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "<returncode>0</returncode>\n<output>\n</output>"
+        }
+      ]
+    },
+    ...
+  ],
+  "trajectory_format": "mini-swe-agent-1"
+}
+```
+
+## Controls
+
+The main page looks like this:
+
+### Top menu bar
+
+Row 1:
+
+* Previous experiment button (jumps to previous experiment, same instance)
+* Experiment drop down: Lists the names of all experiment folders
+* Next experiment button (jumps to next experiment, same instance)
+
+Row 2:
+
+* Previous instance button (jumps to previous instance, same experimnet)
+* Instance drop down: Lists the names of all instances
+* Next instance button
+
+### Overview block
+
+Here you show the content of "info", in particular exit status and model stats.
+
+### Messages
+
+Format every message.

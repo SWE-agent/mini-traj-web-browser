@@ -1,0 +1,49 @@
+{{ define "main" }}
+<div class="trajectory-viewer">
+    <header class="header">
+        <h1>AI Agent Trajectory Viewer</h1>
+    </header>
+
+    <!-- Navigation Controls -->
+    <div class="navigation-controls">
+        <!-- Experiment Navigation Row -->
+        <div class="nav-row">
+            <button id="prev-experiment" class="nav-button" disabled>&larr; Prev Experiment</button>
+            <select id="experiment-select" class="dropdown">
+                <option value="">Loading experiments...</option>
+            </select>
+            <button id="next-experiment" class="nav-button" disabled>Next Experiment &rarr;</button>
+        </div>
+
+        <!-- Instance Navigation Row -->
+        <div class="nav-row">
+            <button id="prev-instance" class="nav-button" disabled>&larr; Prev Instance</button>
+            <select id="instance-select" class="dropdown">
+                <option value="">Loading instances...</option>
+            </select>
+            <button id="next-instance" class="nav-button" disabled>Next Instance &rarr;</button>
+        </div>
+    </div>
+
+    <!-- Overview Block -->
+    <div class="overview-block" id="overview-block">
+        <h2>Overview</h2>
+        <div id="overview-content">
+            <p>Select an experiment and instance to view trajectory data.</p>
+        </div>
+    </div>
+
+    <!-- Messages Section -->
+    <div class="messages-section" id="messages-section">
+        <h2>Messages</h2>
+        <div id="messages-content">
+            <p>Messages will appear here when you select a trajectory.</p>
+        </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loading-indicator" class="loading-indicator" style="display: none;">
+        <p>Loading trajectory data...</p>
+    </div>
+</div>
+{{ end }}

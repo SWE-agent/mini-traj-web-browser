@@ -1,0 +1,11 @@
+baseURL = 'http://localhost:1313'
+languageCode = 'en-us'
+title = 'Trajectory Viewer'
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+
+[params]
+  description = "AI Agent Trajectory Explorer"
