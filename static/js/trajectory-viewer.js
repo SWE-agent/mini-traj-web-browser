@@ -147,7 +147,7 @@ class TrajectoryViewer {
         const foundInstances = [];
         
         for (const instanceName of instancePatterns) {
-            const trajPath = `/data/${experimentName}/${instanceName}/${instanceName}.traj.json`;
+            const trajPath = `data/${experimentName}/${instanceName}/${instanceName}.traj.json`;
             
             try {
                 const response = await fetch(trajPath, { method: 'HEAD' });
@@ -384,7 +384,7 @@ class TrajectoryViewer {
         loadingIndicator.style.display = 'block';
         
         try {
-            const trajPath = `/data/${this.currentExperiment.name}/${this.currentInstance}/${this.currentInstance}.traj.json`;
+            const trajPath = `data/${this.currentExperiment.name}/${this.currentInstance}/${this.currentInstance}.traj.json`;
             const response = await fetch(trajPath);
             
             if (!response.ok) {
@@ -400,7 +400,7 @@ class TrajectoryViewer {
                 <div class="error">
                     <p><strong>Error loading trajectory data:</strong></p>
                     <p>${error.message}</p>
-                    <p>Path: /data/${this.currentExperiment.name}/${this.currentInstance}/${this.currentInstance}.traj.json</p>
+                    <p>Path: data/${this.currentExperiment.name}/${this.currentInstance}/${this.currentInstance}.traj.json</p>
                 </div>
             `;
         } finally {
