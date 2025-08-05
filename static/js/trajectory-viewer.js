@@ -12,6 +12,7 @@ class TrajectoryViewer {
         this.initTheme();
         await this.loadExperiments();
         this.setupEventListeners();
+        this.initFromURL();
         this.updateUI();
     }
 
@@ -74,6 +75,73 @@ class TrajectoryViewer {
         
         console.log('Discovery complete. Found experiments:', this.experiments);
     }
+
+    initFromURL() {
+        const { experimentName, instanceName } = this.parseURLSegments();
+        if (experimentName && this.experiments.some(exp => exp.name === experimentName)) {
+            this.selectExperiment(experimentName).then(() => {
+                // If instance is specified in URL and exists, select it
+                if (instanceName && this.currentExperiment && 
+                    this.currentExperiment.instances.includes(instanceName)) {
+                    this.selectInstance(instanceName);
+                }
+            });
+        }
+    }
+
+    parseURLSegments() {
+        const path = window.location.pathname;
+        // Remove leading slash and extract segments
+        const segments = path.replace(/^\//, '').split('/').filter(s => s);
+        return {
+            experimentName: segments[0] || null,
+            instanceName: segments[1] || null
+        };
+    }
+
+    parseURLForExperiment() {
+        // Keep this method for backward compatibility
+        return this.parseURLSegments().experimentName;
+    }
+
+    updateURL(experimentName, instanceName = null) {
+        let newPath = '/';
+        if (experimentName) {
+            newPath += experimentName;
+            if (instanceName) {
+                newPath += `/${instanceName}`;
+            }
+        }
+        
+        // Update URL without reloading the page
+        if (window.location.pathname !== newPath) {
+            window.history.pushState(
+                { experiment: experimentName, instance: instanceName }, 
+                '', 
+                newPath
+            );
+        }
+    }
+
+    handlePopState(event) {
+        // Handle browser back/forward navigation
+        const { experimentName, instanceName } = this.parseURLSegments();
+        if (experimentName && this.experiments.some(exp => exp.name === experimentName)) {
+            this.selectExperiment(experimentName).then(() => {
+                // If instance is specified in URL and exists, select it
+                if (instanceName && this.currentExperiment && 
+                    this.currentExperiment.instances.includes(instanceName)) {
+                    this.selectInstance(instanceName);
+                }
+            });
+        } else {
+            // No experiment in URL, clear selection
+            this.currentExperiment = null;
+            this.currentInstance = null;
+            this.trajectoryData = null;
+            this.updateUI();
+        }
+    }
     
     async discoverInstancesForExperiment(experimentName, instancePatterns) {
         const foundInstances = [];
@@ -125,6 +193,11 @@ class TrajectoryViewer {
         // Theme toggle
         document.getElementById('theme-toggle').addEventListener('click', () => {
             this.toggleTheme();
+        });
+
+        // Browser navigation (back/forward)
+        window.addEventListener('popstate', (event) => {
+            this.handlePopState(event);
         });
     }
 
@@ -268,11 +341,21 @@ class TrajectoryViewer {
     }
 
     async selectExperiment(experimentName) {
-        if (!experimentName) return;
+        if (!experimentName) {
+            this.currentExperiment = null;
+            this.currentInstance = null;
+            this.trajectoryData = null;
+            this.updateURL('');
+            this.updateUI();
+            return;
+        }
         
         this.currentExperiment = this.experiments.find(exp => exp.name === experimentName);
         this.currentInstance = null;
         this.trajectoryData = null;
+        
+        // Update URL with experiment name
+        this.updateURL(experimentName);
         
         // Auto-select first instance if available
         if (this.currentExperiment && this.currentExperiment.instances.length > 0) {
@@ -286,6 +369,10 @@ class TrajectoryViewer {
         if (!instanceName || !this.currentExperiment) return;
         
         this.currentInstance = instanceName;
+        
+        // Update URL with both experiment and instance
+        this.updateURL(this.currentExperiment.name, instanceName);
+        
         await this.loadTrajectoryData();
         this.updateUI();
     }

@@ -6,6 +6,8 @@ An AI Agent Trajectory Explorer built with Hugo and JavaScript for viewing AI ag
 
 - **Experiment Navigation**: Browse through different experiments with previous/next buttons and dropdown selection
 - **Instance Navigation**: Navigate through instances within each experiment
+- **URL Routing**: Direct links to specific experiments and instances with deep linking support
+- **Browser Navigation**: Full support for browser back/forward buttons and history
 - **Overview Display**: Shows exit status, model statistics, API calls, and costs
 - **Message Formatting**: Displays all conversation messages with proper formatting for different roles (system, user, assistant)
 - **Responsive Design**: Works on desktop and mobile devices
@@ -66,6 +68,33 @@ hugo server
 ```
 
 Then open http://localhost:1313 in your browser.
+
+### URL Routing
+
+The trajectory viewer supports direct linking to specific experiments and instances:
+
+**Experiment URLs:**
+- `http://localhost:1313/example-experiemnt` - View specific experiment
+- `http://localhost:1313/experiment-1` - View experiment-1
+- `http://localhost:1313/` - Home page with no experiment selected
+
+**Instance URLs:**
+- `http://localhost:1313/example-experiemnt/example_instance` - View specific experiment and instance
+- `http://localhost:1313/experiment-1/instance_1` - View experiment-1, instance_1
+
+**Features:**
+- **Deep Linking**: Share URLs to specific experiments or instances
+- **Browser Navigation**: Back/forward buttons work correctly
+- **Auto-Selection**: When navigating to an experiment URL, the first instance is automatically selected
+- **URL Updates**: URLs update automatically as you navigate through the interface
+- **Bookmarking**: Bookmark specific trajectories and return to them later
+
+**URL Structure:**
+```
+/                          # Home page (no selection)
+/{experiment-name}         # Experiment with first instance
+/{experiment-name}/{instance-name}  # Specific experiment and instance
+```
 
 ### Adding New Experiments
 
