@@ -8,4 +8,4 @@ title = 'Trajectory Viewer'
       unsafe = true
 
 [params]
-  description = "AI Agent Trajectory Explorer"
+  description = "Mini Agent Trajectory Browser"
