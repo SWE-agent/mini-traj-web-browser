@@ -27,7 +27,6 @@ traj-viewer-mini/
 │   │   └── style.css              # Stylesheet
 │   ├── js/
 │   │   └── trajectory-viewer.js   # Main JavaScript
-│   ├── data-index.json            # Experiment/instance index
 │   └── data/                      # Symlink to data directory
 ├── content/
 │   └── _index.md                  # Home page content
@@ -71,20 +70,21 @@ Then open http://localhost:1313 in your browser.
 ### Adding New Experiments
 
 1. Create a new folder in the `data/` directory with your experiment name
-2. Create instance folders within the experiment folder
+2. Create instance folders within the experiment folder  
 3. Place `.traj.json` files in each instance folder
-4. Update `static/data-index.json` to include the new experiment:
 
-```json
-{
-  "experiments": [
-    {
-      "name": "your-experiment-name",
-      "instances": ["instance1", "instance2"]
-    }
-  ]
-}
-```
+The trajectory viewer will automatically discover experiments and instances when you reload the page. It tries common naming patterns, so using standard names like `experiment-1`, `instance_1`, etc. will ensure reliable discovery.
+
+## Automatic Discovery
+
+The trajectory viewer uses an intelligent discovery system that eliminates the need for manual index files:
+
+- **Experiment Discovery**: Tries common experiment naming patterns like `example-experiment`, `experiment-1`, `test-experiment`, etc.
+- **Instance Discovery**: For each found experiment, discovers instances using patterns like `instance_1`, `example_instance`, `test_instance`, etc.
+- **Validation**: Only includes experiments/instances that have valid `.traj.json` files
+- **Console Logging**: Check browser console for discovery progress and found experiments
+
+This approach automatically adapts to your data structure without requiring manual configuration.
 
 ### Building for Production
 

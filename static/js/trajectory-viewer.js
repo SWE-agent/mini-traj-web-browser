@@ -15,33 +15,83 @@ class TrajectoryViewer {
     }
 
     async loadExperiments() {
-        try {
-            // Since we're in a static site, we'll scan the data directory structure
-            // This assumes the data directory is accessible via static serving
-            const response = await fetch('/data-index.json');
-            if (response.ok) {
-                const data = await response.json();
-                this.experiments = data.experiments;
-            } else {
-                // Fallback: try to discover experiments from known structure
-                await this.discoverExperiments();
-            }
-        } catch (error) {
-            console.warn('Could not load experiments index, using discovery method');
-            await this.discoverExperiments();
-        }
+        // Use discovery method to automatically find experiments and instances
+        await this.discoverExperiments();
     }
 
     async discoverExperiments() {
-        // Since we can't dynamically scan directories in a static site,
-        // we'll need to manually specify known experiments for now
-        // In a real implementation, you'd generate a data-index.json during build
-        this.experiments = [
-            {
-                name: 'example-experiemnt',
-                instances: ['example_instance']
-            }
+        console.log('Discovering experiments...');
+        this.experiments = [];
+        
+        // Common experiment name patterns to try
+        const experimentPatterns = [
+            'example-experiemnt',
+            'example-experiment', 
+            'experiment-1',
+            'experiment-2',
+            'test-experiment',
+            'demo',
+            'sample'
         ];
+        
+        // Common instance name patterns to try
+        const instancePatterns = [
+            'example_instance',
+            'instance_1',
+            'instance_2', 
+            'test_instance',
+            'demo_instance',
+            'sample_instance'
+        ];
+        
+        for (const experimentName of experimentPatterns) {
+            const instances = await this.discoverInstancesForExperiment(experimentName, instancePatterns);
+            if (instances.length > 0) {
+                this.experiments.push({
+                    name: experimentName,
+                    instances: instances
+                });
+                console.log(`Found experiment: ${experimentName} with instances:`, instances);
+            }
+        }
+        
+        // If no experiments found with patterns, try to read from current directory structure
+        if (this.experiments.length === 0) {
+            console.log('No experiments found with common patterns, checking if data directory is accessible...');
+            // Try some basic paths that might exist
+            const basicPatterns = ['data', 'experiments', 'test'];
+            for (const pattern of basicPatterns) {
+                const instances = await this.discoverInstancesForExperiment(pattern, instancePatterns);
+                if (instances.length > 0) {
+                    this.experiments.push({
+                        name: pattern,
+                        instances: instances
+                    });
+                }
+            }
+        }
+        
+        console.log('Discovery complete. Found experiments:', this.experiments);
+    }
+    
+    async discoverInstancesForExperiment(experimentName, instancePatterns) {
+        const foundInstances = [];
+        
+        for (const instanceName of instancePatterns) {
+            const trajPath = `/data/${experimentName}/${instanceName}/${instanceName}.traj.json`;
+            
+            try {
+                const response = await fetch(trajPath, { method: 'HEAD' });
+                if (response.ok) {
+                    foundInstances.push(instanceName);
+                    console.log(`Found instance: ${instanceName} in experiment: ${experimentName}`);
+                }
+            } catch (error) {
+                // Instance doesn't exist, continue checking others
+            }
+        }
+        
+        return foundInstances;
     }
 
     setupEventListeners() {
